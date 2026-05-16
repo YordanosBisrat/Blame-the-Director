@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'core/theme/app_theme.dart';
 
 void main() {
   runApp(const BlameTheDirectorApp());
@@ -12,9 +13,7 @@ class BlameTheDirectorApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Blame the Director',
-      theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF0D0D0D),
-      ),
+      theme: AppTheme.darkTheme,
       home: const HomePage(),
     );
   }
@@ -33,7 +32,7 @@ class HomePage extends StatelessWidget {
       body: const Center(
         child: Text(
           'Every bad movie has someone to blame.',
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: TextStyle(fontSize: 20),
         ),
       ),
     );
