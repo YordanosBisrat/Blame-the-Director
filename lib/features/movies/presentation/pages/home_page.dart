@@ -1,59 +1,43 @@
 import 'package:flutter/material.dart';
-import '../../data/datasources/movie_remote_data_source.dart';
-import '../../data/models/movie_model.dart';
 import '../widgets/movie_card.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HomePage extends StatefulWidget {
+import '../bloc/movie_bloc.dart';
+import '../bloc/movie_state.dart';
+
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final MovieRemoteDataSource remoteDataSource = MovieRemoteDataSource();
-
-  List<MovieModel> movies = [];
-
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchMovies();
-  }
-
-  Future<void> fetchMovies() async {
-    try {
-      final result = await remoteDataSource.getPopularMovies();
-
-      setState(() {
-        movies = result;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-
-      debugPrint(e.toString());
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Blame the Director')),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: movies.length,
+
+      body: BlocBuilder<MovieBloc, MovieState>(
+        builder: (context, state) {
+          if (state is MoviesLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is MoviesLoaded) {
+            return ListView.builder(
+              itemCount: state.movies.length,
+
               itemBuilder: (context, index) {
-                final movie = movies[index];
+                final movie = state.movies[index];
 
                 return MovieCard(movie: movie);
               },
-            ),
+            );
+          }
+
+          if (state is MoviesError) {
+            return Center(child: Text(state.message));
+          }
+
+          return const SizedBox();
+        },
+      ),
     );
   }
 }
