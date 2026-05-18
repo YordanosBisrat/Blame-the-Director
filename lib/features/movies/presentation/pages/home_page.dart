@@ -7,6 +7,7 @@ import '../../data/models/movie_model.dart';
 
 import '../widgets/movie_card.dart';
 import '../widgets/add_review_dialog.dart';
+import '../widgets/edit_review_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+
     fetchMovies();
   }
 
@@ -65,6 +67,16 @@ class _HomePageState extends State<HomePage> {
     } catch (e) {
       debugPrint(e.toString());
     }
+  }
+
+  void updateReview(int movieId, int reviewIndex, String newReview) {
+    setState(() {
+      reviews[movieId]![reviewIndex] = newReview;
+    });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Review Updated')));
   }
 
   void deleteReview(int movieId, int reviewIndex) {
@@ -140,6 +152,33 @@ class _HomePageState extends State<HomePage> {
                                     '📝 $review',
 
                                     style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+
+                                IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+
+                                      builder: (_) {
+                                        return EditReviewDialog(
+                                          initialText: review,
+
+                                          onSubmit: (newText) {
+                                            updateReview(
+                                              movie.id,
+                                              reviewIndex,
+                                              newText,
+                                            );
+                                          },
+                                        );
+                                      },
+                                    );
+                                  },
+
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.amber,
                                   ),
                                 ),
 
