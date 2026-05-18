@@ -14,6 +14,7 @@ class MovieCard extends StatefulWidget {
 }
 
 class _MovieCardState extends State<MovieCard> {
+  String? reviewText;
   final ReviewRemoteDataSource reviewRemoteDataSource =
       ReviewRemoteDataSource();
 
@@ -65,6 +66,18 @@ class _MovieCardState extends State<MovieCard> {
                 ),
 
                 const SizedBox(height: 12),
+                if (reviewText != null) ...[
+                  Text(
+                    'Your Review:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  Text(reviewText!),
+
+                  const SizedBox(height: 12),
+                ],
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -92,6 +105,9 @@ class _MovieCardState extends State<MovieCard> {
                                   await reviewRemoteDataSource.addReview(
                                     reviewText,
                                   );
+                                  setState(() {
+                                    this.reviewText = reviewText;
+                                  });
 
                                   if (!context.mounted) {
                                     return;
