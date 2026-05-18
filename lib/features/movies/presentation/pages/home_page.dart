@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../data/datasources/movie_remote_data_source.dart';
-import '../../data/datasources/review_remote_data_source.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/models/movie_model.dart';
+import '../bloc/movie_bloc.dart';
+import '../bloc/movie_state.dart';
+
+import '../../data/datasources/review_remote_data_source.dart';
 
 import '../widgets/movie_card.dart';
 import '../widgets/add_review_dialog.dart';
@@ -17,37 +19,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final MovieRemoteDataSource remoteDataSource = MovieRemoteDataSource();
-
-  List<MovieModel> movies = [];
-
-  bool isLoading = true;
-
   Map<int, List<String>> reviews = {};
-
-  @override
-  void initState() {
-    super.initState();
-
-    fetchMovies();
-  }
-
-  Future<void> fetchMovies() async {
-    try {
-      final result = await remoteDataSource.getPopularMovies();
-
-      setState(() {
-        movies = result;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-
-      debugPrint(e.toString());
-    }
-  }
 
   Future<void> addReview(int movieId, String reviewText) async {
     try {
@@ -94,9 +66,20 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Blame the Director')),
 
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
+      body: BlocBuilder<MovieBloc, MovieState>(
+        builder: (context, state) {
+          if (state is MovieLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (state is MovieError) {
+            return Center(child: Text(state.message));
+          }
+
+          if (state is MovieLoaded) {
+            final movies = state.movies;
+
+            return ListView.builder(
               itemCount: movies.length,
 
               itemBuilder: (context, index) {
@@ -178,6 +161,7 @@ class _HomePageState extends State<HomePage> {
 
                                   icon: const Icon(
                                     Icons.edit,
+
                                     color: Colors.amber,
                                   ),
                                 ),
@@ -203,7 +187,12 @@ class _HomePageState extends State<HomePage> {
                   ],
                 );
               },
-            ),
+            );
+          }
+
+          return const SizedBox();
+        },
+      ),
     );
   }
 }
