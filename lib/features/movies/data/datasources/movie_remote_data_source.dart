@@ -4,17 +4,19 @@ import '../../../../core/network/dio_client.dart';
 import '../models/movie_model.dart';
 
 class MovieRemoteDataSource {
-  final Dio dio = DioClient().dio;
+  final Dio _dio;
+
+  MovieRemoteDataSource(TmdbDioClient client) : _dio = client.dio;
 
   Future<List<MovieModel>> getPopularMovies() async {
     try {
-      final response = await dio.get('/movie/popular');
-
+      final response = await _dio.get('/movie/popular');
       final results = response.data['results'] as List;
-
-      return results.map((movie) => MovieModel.fromJson(movie)).toList();
-    } catch (e) {
-      throw Exception('Failed to fetch movies');
+      return results
+          .map((m) => MovieModel.fromJson(m as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw Exception('Failed to fetch movies: ${e.message}');
     }
   }
 }
