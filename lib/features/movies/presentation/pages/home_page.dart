@@ -21,11 +21,17 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Map<int, List<String>> reviews = {};
 
+  final TextEditingController searchController = TextEditingController();
+
+  String searchQuery = '';
+
   Future<void> addReview(int movieId, String reviewText) async {
     try {
       final reviewRemoteDataSource = ReviewRemoteDataSource();
 
       await reviewRemoteDataSource.addReview(reviewText);
+
+      if (!mounted) return;
 
       setState(() {
         reviews.putIfAbsent(movieId, () => []);
@@ -79,114 +85,169 @@ class _HomePageState extends State<HomePage> {
           if (state is MovieLoaded) {
             final movies = state.movies;
 
-            return ListView.builder(
-              itemCount: movies.length,
+            final filteredMovies = movies
+                .where(
+                  (movie) => movie.title.toLowerCase().contains(
+                    searchQuery.toLowerCase(),
+                  ),
+                )
+                .toList();
 
-              itemBuilder: (context, index) {
-                final movie = movies[index];
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
 
-                return Column(
-                  children: [
-                    MovieCard(
-                      movie: movie,
+                  child: TextField(
+                    controller: searchController,
 
-                      onAddReview: () {
-                        showDialog(
-                          context: context,
+                    onChanged: (value) {
+                      setState(() {
+                        searchQuery = value;
+                      });
+                    },
 
-                          builder: (_) {
-                            return AddReviewDialog(
-                              onSubmit: (text) {
-                                addReview(movie.id, text);
-                              },
-                            );
-                          },
-                        );
-                      },
+                    style: const TextStyle(color: Colors.white),
+
+                    decoration: InputDecoration(
+                      hintText: 'Search movies...',
+
+                      hintStyle: const TextStyle(color: Colors.white54),
+
+                      prefixIcon: const Icon(
+                        Icons.search,
+
+                        color: Colors.white54,
+                      ),
+
+                      filled: true,
+
+                      fillColor: Colors.white10,
+
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+
+                        borderSide: BorderSide.none,
+                      ),
                     ),
+                  ),
+                ),
 
-                    if (reviews[movie.id] != null)
-                      ...reviews[movie.id]!.asMap().entries.map((entry) {
-                        final reviewIndex = entry.key;
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filteredMovies.length,
 
-                        final review = entry.value;
+                    itemBuilder: (context, index) {
+                      final movie = filteredMovies[index];
 
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 4,
+                      return Column(
+                        children: [
+                          MovieCard(
+                            movie: movie,
+
+                            onAddReview: () {
+                              showDialog(
+                                context: context,
+
+                                builder: (_) {
+                                  return AddReviewDialog(
+                                    onSubmit: (text) {
+                                      addReview(movie.id, text);
+                                    },
+                                  );
+                                },
+                              );
+                            },
                           ),
 
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
+                          if (reviews[movie.id] != null)
+                            ...reviews[movie.id]!.asMap().entries.map((entry) {
+                              final reviewIndex = entry.key;
 
-                            decoration: BoxDecoration(
-                              color: Colors.white10,
+                              final review = entry.value;
 
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    '📝 $review',
-
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 4,
                                 ),
 
-                                IconButton(
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
+                                child: Container(
+                                  padding: const EdgeInsets.all(12),
 
-                                      builder: (_) {
-                                        return EditReviewDialog(
-                                          initialText: review,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white10,
 
-                                          onSubmit: (newText) {
-                                            updateReview(
-                                              movie.id,
-                                              reviewIndex,
-                                              newText,
-                                            );
-                                          },
-                                        );
-                                      },
-                                    );
-                                  },
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
 
-                                  icon: const Icon(
-                                    Icons.edit,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
 
-                                    color: Colors.amber,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          '📝 $review',
+
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+
+                                      IconButton(
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+
+                                            builder: (_) {
+                                              return EditReviewDialog(
+                                                initialText: review,
+
+                                                onSubmit: (newText) {
+                                                  updateReview(
+                                                    movie.id,
+                                                    reviewIndex,
+                                                    newText,
+                                                  );
+                                                },
+                                              );
+                                            },
+                                          );
+                                        },
+
+                                        icon: const Icon(
+                                          Icons.edit,
+
+                                          color: Colors.amber,
+                                        ),
+                                      ),
+
+                                      IconButton(
+                                        onPressed: () {
+                                          deleteReview(movie.id, reviewIndex);
+                                        },
+
+                                        icon: const Icon(
+                                          Icons.delete,
+
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+                              );
+                            }),
 
-                                IconButton(
-                                  onPressed: () {
-                                    deleteReview(movie.id, reviewIndex);
-                                  },
-
-                                  icon: const Icon(
-                                    Icons.delete,
-
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-
-                    const SizedBox(height: 10),
-                  ],
-                );
-              },
+                          const SizedBox(height: 10),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
             );
           }
 
