@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../data/models/movie_model.dart';
 
+import '../pages/movie_details_page.dart';
+
 class MovieCard extends StatelessWidget {
   final MovieModel movie;
 
@@ -11,102 +13,108 @@ class MovieCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => MovieDetailsPage(movie: movie)),
+        );
+      },
 
-      decoration: BoxDecoration(
-        color: Colors.black87,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
 
-        borderRadius: BorderRadius.circular(20),
-      ),
+        decoration: BoxDecoration(
+          color: Colors.white10,
 
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+          borderRadius: BorderRadius.circular(16),
+        ),
 
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
 
-            child: Image.network(
-              movie.fullPosterPath,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(16),
+              ),
 
-              height: 300,
+              child: Image.network(
+                movie.fullPosterPath,
 
-              width: double.infinity,
+                height: 250,
 
-              fit: BoxFit.cover,
+                width: double.infinity,
+
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
 
-          Padding(
-            padding: const EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(12),
 
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
 
-              children: [
-                Text(
-                  movie.title,
+                children: [
+                  Text(
+                    movie.title,
 
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                    style: const TextStyle(
+                      color: Colors.white,
 
-                const SizedBox(height: 10),
+                      fontSize: 20,
 
-                Text(
-                  movie.overview,
-
-                  maxLines: 3,
-
-                  overflow: TextOverflow.ellipsis,
-
-                  style: const TextStyle(color: Colors.white70, fontSize: 16),
-                ),
-
-                const SizedBox(height: 14),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.star, color: Colors.amber),
-
-                        const SizedBox(width: 5),
-
-                        Text(
-                          movie.voteAverage.toString(),
-
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
+                      fontWeight: FontWeight.bold,
                     ),
+                  ),
 
-                    TextButton.icon(
+                  const SizedBox(height: 8),
+
+                  Row(
+                    children: [
+                      const Icon(Icons.star, color: Colors.amber, size: 20),
+
+                      const SizedBox(width: 4),
+
+                      Text(
+                        movie.voteAverage.toString(),
+
+                        style: const TextStyle(color: Colors.white70),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  Text(
+                    movie.overview,
+
+                    maxLines: 3,
+
+                    overflow: TextOverflow.ellipsis,
+
+                    style: const TextStyle(color: Colors.white70, height: 1.5),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  SizedBox(
+                    width: double.infinity,
+
+                    child: ElevatedButton.icon(
                       onPressed: onAddReview,
 
-                      icon: const Icon(Icons.rate_review, color: Colors.red),
+                      icon: const Icon(Icons.rate_review),
 
-                      label: const Text(
-                        'Add Review',
-
-                        style: TextStyle(color: Colors.red),
-                      ),
+                      label: const Text('Add Review'),
                     ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
