@@ -3,7 +3,6 @@ import 'core/theme/app_theme.dart';
 import 'features/movies/presentation/pages/home_page.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'core/network/dio_client.dart';
 import 'features/movies/data/datasources/movie_remote_data_source.dart';
 import 'features/movies/presentation/bloc/movie_bloc.dart';
 import 'features/movies/presentation/bloc/movie_event.dart';
