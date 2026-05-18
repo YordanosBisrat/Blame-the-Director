@@ -117,7 +117,7 @@ Reviews are serialised as a JSON string inside DummyJSON's `body` field:
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/YOUR_USERNAME/blame_the_director.git
+git clone https://github.com/YordanosBisrat/blame_the_director.git
 cd blame_the_director
 ```
 
@@ -210,4 +210,3 @@ blame_the_director/
 
 ## 👤 Author
  
-Flutter · Dio · Bloc · Clean Architecture
