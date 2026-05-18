@@ -47,6 +47,38 @@ class MovieCard extends StatelessWidget {
                 width: double.infinity,
 
                 fit: BoxFit.cover,
+
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+
+                  return Container(
+                    height: 250,
+
+                    alignment: Alignment.center,
+
+                    child: const CircularProgressIndicator(),
+                  );
+                },
+
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    height: 250,
+
+                    color: Colors.grey.shade900,
+
+                    alignment: Alignment.center,
+
+                    child: const Icon(
+                      Icons.broken_image,
+
+                      color: Colors.white54,
+
+                      size: 50,
+                    ),
+                  );
+                },
               ),
             ),
 

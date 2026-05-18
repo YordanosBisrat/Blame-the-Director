@@ -28,6 +28,36 @@ class MovieDetailsPage extends StatelessWidget {
                 movie.fullPosterPath,
 
                 fit: BoxFit.cover,
+
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) {
+                    return child;
+                  }
+
+                  return Container(
+                    color: Colors.black,
+
+                    alignment: Alignment.center,
+
+                    child: const CircularProgressIndicator(),
+                  );
+                },
+
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    color: Colors.black,
+
+                    alignment: Alignment.center,
+
+                    child: const Icon(
+                      Icons.broken_image,
+
+                      color: Colors.white54,
+
+                      size: 60,
+                    ),
+                  );
+                },
               ),
             ),
           ),
