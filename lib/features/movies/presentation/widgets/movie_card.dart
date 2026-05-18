@@ -1,49 +1,45 @@
 import 'package:flutter/material.dart';
 
 import '../../data/models/movie_model.dart';
-import '../../data/datasources/review_remote_data_source.dart';
-import 'add_review_dialog.dart';
 
-class MovieCard extends StatefulWidget {
+class MovieCard extends StatelessWidget {
   final MovieModel movie;
 
-  const MovieCard({super.key, required this.movie});
+  final VoidCallback onAddReview;
 
-  @override
-  State<MovieCard> createState() => _MovieCardState();
-}
-
-class _MovieCardState extends State<MovieCard> {
-  String? reviewText;
-  final ReviewRemoteDataSource reviewRemoteDataSource =
-      ReviewRemoteDataSource();
+  const MovieCard({super.key, required this.movie, required this.onAddReview});
 
   @override
   Widget build(BuildContext context) {
-    final movie = widget.movie;
+    return Container(
+      margin: const EdgeInsets.all(16),
 
-    return Card(
-      margin: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.black87,
 
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        borderRadius: BorderRadius.circular(20),
+      ),
 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
 
         children: [
           ClipRRect(
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
 
             child: Image.network(
               movie.fullPosterPath,
+
               height: 300,
+
               width: double.infinity,
+
               fit: BoxFit.cover,
             ),
           ),
 
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(16),
 
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,33 +47,27 @@ class _MovieCardState extends State<MovieCard> {
               children: [
                 Text(
                   movie.title,
+
                   style: const TextStyle(
-                    fontSize: 20,
+                    fontSize: 28,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
 
-                const SizedBox(height: 8),
+                const SizedBox(height: 10),
 
                 Text(
                   movie.overview,
+
                   maxLines: 3,
+
                   overflow: TextOverflow.ellipsis,
+
+                  style: const TextStyle(color: Colors.white70, fontSize: 16),
                 ),
 
-                const SizedBox(height: 12),
-                if (reviewText != null) ...[
-                  Text(
-                    'Your Review:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Text(reviewText!),
-
-                  const SizedBox(height: 12),
-                ],
+                const SizedBox(height: 14),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -87,55 +77,29 @@ class _MovieCardState extends State<MovieCard> {
                       children: [
                         const Icon(Icons.star, color: Colors.amber),
 
-                        const SizedBox(width: 4),
+                        const SizedBox(width: 5),
 
-                        Text(movie.voteAverage.toStringAsFixed(1)),
+                        Text(
+                          movie.voteAverage.toString(),
+
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
                       ],
                     ),
 
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
+                    TextButton.icon(
+                      onPressed: onAddReview,
 
-                          builder: (_) {
-                            return AddReviewDialog(
-                              onSubmit: (reviewText) async {
-                                try {
-                                  await reviewRemoteDataSource.addReview(
-                                    reviewText,
-                                  );
-                                  setState(() {
-                                    this.reviewText = reviewText;
-                                  });
+                      icon: const Icon(Icons.rate_review, color: Colors.red),
 
-                                  if (!context.mounted) {
-                                    return;
-                                  }
+                      label: const Text(
+                        'Add Review',
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Review added successfully',
-                                      ),
-                                    ),
-                                  );
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Failed to add review'),
-                                    ),
-                                  );
-                                }
-                              },
-                            );
-                          },
-                        );
-                      },
-
-                      icon: const Icon(Icons.add_comment),
-
-                      label: const Text('Add Review'),
+                        style: TextStyle(color: Colors.red),
+                      ),
                     ),
                   ],
                 ),
