@@ -67,6 +67,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void deleteReview(int movieId, int reviewIndex) {
+    setState(() {
+      reviews[movieId]!.removeAt(reviewIndex);
+    });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text('Review Deleted')));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,23 +111,54 @@ class _HomePageState extends State<HomePage> {
                     ),
 
                     if (reviews[movie.id] != null)
-                      ...reviews[movie.id]!.map(
-                        (review) => Padding(
+                      ...reviews[movie.id]!.asMap().entries.map((entry) {
+                        final reviewIndex = entry.key;
+
+                        final review = entry.value;
+
+                        return Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
                             vertical: 4,
                           ),
 
-                          child: Align(
-                            alignment: Alignment.centerLeft,
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
 
-                            child: Text(
-                              '📝 $review',
-                              style: const TextStyle(color: Colors.white),
+                            decoration: BoxDecoration(
+                              color: Colors.white10,
+
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    '📝 $review',
+
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+
+                                IconButton(
+                                  onPressed: () {
+                                    deleteReview(movie.id, reviewIndex);
+                                  },
+
+                                  icon: const Icon(
+                                    Icons.delete,
+
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
 
                     const SizedBox(height: 10),
                   ],
